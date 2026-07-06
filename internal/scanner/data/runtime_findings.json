@@ -1,0 +1,62 @@
+[
+  {
+    "id": "RT-001",
+    "resource": "deployment/checkout-api",
+    "namespace": "payments",
+    "severity": "Critical",
+    "title": "CVE-2024-3094 actively reachable via loaded liblzma symbols",
+    "description": "Runtime engine confirmed the vulnerable liblzma symbols are loaded and reachable from the running process, not just present on disk.",
+    "cve": "CVE-2024-3094",
+    "source": "runtime-engine-v2"
+  },
+  {
+    "id": "RT-002",
+    "resource": "deployment/checkout-api",
+    "namespace": "payments",
+    "severity": "High",
+    "title": "CVE-2023-44487 in ingress-nginx",
+    "description": "Vulnerable ingress controller image confirmed, plus abnormal HTTP/2 stream reset rate observed on this workload in the last hour.",
+    "cve": "CVE-2023-44487",
+    "source": "runtime-engine-v2"
+  },
+  {
+    "id": "RT-003",
+    "resource": "deployment/auth-service",
+    "namespace": "identity",
+    "severity": "Low",
+    "title": "CVE-2022-0185 in kernel headers (not exploitable at runtime)",
+    "description": "Runtime engine downgraded this from High to Low: the vulnerable syscall path is never exercised by this workload's observed behavior profile.",
+    "cve": "CVE-2022-0185",
+    "source": "runtime-engine-v2"
+  },
+  {
+    "id": "RT-004",
+    "resource": "deployment/reporting-worker",
+    "namespace": "analytics",
+    "severity": "Critical",
+    "title": "Unexpected reverse shell spawned from reporting-worker",
+    "description": "Runtime engine detected a shell process (/bin/sh) spawned by the application process with an outbound connection to a non-allowlisted IP. Not detectable by static scanning.",
+    "cve": "",
+    "source": "runtime-engine-v2"
+  },
+  {
+    "id": "RT-005",
+    "resource": "daemonset/log-forwarder",
+    "namespace": "kube-system",
+    "severity": "Medium",
+    "title": "Privileged container configuration",
+    "description": "Confirmed privileged: true, and the container has not exercised any privileged syscalls in the last 24h. Candidate for privilege drop.",
+    "cve": "",
+    "source": "runtime-engine-v2"
+  },
+  {
+    "id": "RT-006",
+    "resource": "deployment/checkout-api",
+    "namespace": "payments",
+    "severity": "High",
+    "title": "Unexpected outbound connection to known-bad IP range",
+    "description": "checkout-api process opened a connection to an IP range associated with a known C2 infrastructure list.",
+    "cve": "",
+    "source": "runtime-engine-v2"
+  }
+]

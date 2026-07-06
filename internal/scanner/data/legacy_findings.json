@@ -1,0 +1,62 @@
+[
+  {
+    "id": "LEG-001",
+    "resource": "deployment/checkout-api",
+    "namespace": "payments",
+    "severity": "Critical",
+    "title": "CVE-2024-3094 in liblzma",
+    "description": "Base image includes a vulnerable version of liblzma (xz-utils backdoor). CVSS 10.0.",
+    "cve": "CVE-2024-3094",
+    "source": "legacy-static-scanner"
+  },
+  {
+    "id": "LEG-002",
+    "resource": "deployment/checkout-api",
+    "namespace": "payments",
+    "severity": "High",
+    "title": "CVE-2023-44487 in ingress-nginx",
+    "description": "HTTP/2 Rapid Reset vulnerability present in the ingress controller image.",
+    "cve": "CVE-2023-44487",
+    "source": "legacy-static-scanner"
+  },
+  {
+    "id": "LEG-003",
+    "resource": "deployment/auth-service",
+    "namespace": "identity",
+    "severity": "High",
+    "title": "CVE-2022-0185 in kernel headers",
+    "description": "Container base image bundles vulnerable kernel headers package. Not confirmed exploitable at runtime.",
+    "cve": "CVE-2022-0185",
+    "source": "legacy-static-scanner"
+  },
+  {
+    "id": "LEG-004",
+    "resource": "deployment/reporting-worker",
+    "namespace": "analytics",
+    "severity": "Medium",
+    "title": "CVE-2023-5678 in openssl",
+    "description": "Vulnerable OpenSSL version detected in image layer. No known active exploitation.",
+    "cve": "CVE-2023-5678",
+    "source": "legacy-static-scanner"
+  },
+  {
+    "id": "LEG-005",
+    "resource": "daemonset/log-forwarder",
+    "namespace": "kube-system",
+    "severity": "Medium",
+    "title": "Privileged container configuration",
+    "description": "Pod spec runs with privileged: true. Flagged by static policy scan.",
+    "cve": "",
+    "source": "legacy-static-scanner"
+  },
+  {
+    "id": "LEG-006",
+    "resource": "deployment/checkout-api",
+    "namespace": "payments",
+    "severity": "Low",
+    "title": "CVE-2021-3712 in openssl (legacy layer)",
+    "description": "Older vulnerable layer detected but superseded by later image layer. Low confidence.",
+    "cve": "CVE-2021-3712",
+    "source": "legacy-static-scanner"
+  }
+]

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>K8s Security Posture Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">&#9096;</span>
+      <div>
+        <h1>K8s Security Posture Dashboard</h1>
+        <p class="subtitle">ABC Company &mdash; sample app for the LaunchDarkly SE technical exercise</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="control">
+        <span>Viewing as cluster</span>
+        <select id="persona-select"></select>
+      </label>
+      <span id="engine-badge" class="badge">loading&hellip;</span>
+      <span id="sse-status" class="sse-status" title="Live update connection status">&#9679;</span>
+    </div>
+  </header>
+
+  <section class="summary" id="summary">
+    <div class="summary-card critical"><span class="count" id="count-critical">0</span><span class="label">Critical</span></div>
+    <div class="summary-card high"><span class="count" id="count-high">0</span><span class="label">High</span></div>
+    <div class="summary-card medium"><span class="count" id="count-medium">0</span><span class="label">Medium</span></div>
+    <div class="summary-card low"><span class="count" id="count-low">0</span><span class="label">Low</span></div>
+  </section>
+
+  <p class="eval-reason">Flag evaluation reason: <code id="eval-reason">&mdash;</code></p>
+
+  <main>
+    <table class="findings">
+      <thead>
+        <tr>
+          <th>Severity</th>
+          <th>Resource</th>
+          <th>Finding</th>
+          <th>CVE</th>
+          <th>Source</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="findings-body"></tbody>
+    </table>
+  </main>
+
+  <dialog id="advisor-modal">
+    <form method="dialog" class="advisor-form">
+      <h2>AI Remediation Advisor</h2>
+      <p class="advisor-meta" id="advisor-meta"></p>
+      <pre id="advisor-text">Loading&hellip;</pre>
+      <button value="close">Close</button>
+    </form>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
