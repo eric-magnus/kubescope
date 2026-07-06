@@ -19,7 +19,7 @@ static scanning can't see. This app is the dashboard where that rollout happens.
 | Part 1 — Instant release/rollback | Server-Sent Events (`/events`) push a refresh the instant the flag changes — no page reload |
 | Part 1 — Remediate via trigger | An LD Trigger (webhook) flips the flag off; fire it with `curl` to simulate an incident rollback |
 | Part 2 — Context attributes | A `cluster` context: `environment`, `plan`, `team`, `region` |
-| Part 2 — Individual targeting | The `internal-dogfood-eng` persona is targeted directly |
+| Part 2 — Individual targeting | The `internal-dogfood-eng` persona ("Macrodata Refinement") is targeted directly |
 | Part 2 — Rule-based targeting | A rule like `environment == production AND plan == enterprise` |
 | Extra credit — Experimentation | `Resolve` / `False positive` buttons fire `finding-resolved` / `finding-marked-false-positive` events, used as experiment metrics |
 | Extra credit — AI Configs | The "AI remediation advisor" panel is powered by an LD AI Config (`k8s-remediation-advisor`) managing the prompt + model |
@@ -61,8 +61,8 @@ Create a **boolean** flag with key `new-scan-engine-enabled`.
 
 - Default rule (fallthrough): serve `false` (legacy scanner) to everyone.
 - **Individual targeting:** under Targeting, add an individual target for context kind `cluster`,
-  key `internal-dogfood-eng` → serve `true`. This is your internal dogfood cluster that always
-  gets the new engine early.
+  key `internal-dogfood-eng` → serve `true`. This is "Macrodata Refinement," your internal dogfood
+  cluster that always gets the new engine early.
 - **Rule-based targeting:** add a rule — `environment` is one of `production` AND `plan` is one of
   `enterprise` → serve `true`. This rolls the new engine out to your enterprise production
   customers first.
@@ -136,14 +136,15 @@ Assumptions:
 
 ## 3. Demo script
 
-1. **Release/rollback (Part 1):** Open the app, select the `internal-dogfood-eng` persona from
-   the dropdown — engine badge shows "Runtime Engine v2" because it's individually targeted. Go
-   to the LD dashboard and toggle the flag off; watch the dashboard flip to "Legacy Static
-   Scanner" within about a second, with no reload.
+1. **Release/rollback (Part 1):** Open the app, select "Macrodata Refinement"
+   (`internal-dogfood-eng`) from the dropdown — engine badge shows "Runtime Engine v2" because
+   it's individually targeted. Go to the LD dashboard and toggle the flag off; watch the dashboard
+   flip to "Legacy Static Scanner" within about a second, with no reload.
 2. **Remediate (Part 1):** With the flag back on, fire the Trigger webhook via `curl` and watch
    the same instant flip happen from an "operational" action instead of the dashboard toggle.
-3. **Targeting (Part 2):** Switch personas in the dropdown — `acme-prod-01` (enterprise/production)
-   should get the runtime engine via the rule; `initech-dev-01` (free/development) should not.
+3. **Targeting (Part 2):** Switch personas in the dropdown — "Optics and Design (Production)"
+   (`acme-prod-01`, enterprise/production) should get the runtime engine via the rule;
+   "Choreography and Merriment (Development)" (`initech-dev-01`, free/development) should not.
 4. **Experimentation (extra credit):** Click "Resolve"/"False positive" on a few findings per
    persona, then check the Experiment results in LD after generating enough events.
 5. **AI Configs (extra credit):** Click "AI remediation" on any finding; the modal shows the
