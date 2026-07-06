@@ -36,7 +36,7 @@ type Persona struct {
 var Personas = []Persona{
 	{
 		Key:         "internal-dogfood-eng",
-		Name:        "Internal Dogfood Cluster",
+		Name:        "Macrodata Refinement",
 		Environment: "production",
 		Plan:        "enterprise",
 		Team:        "platform-security",
@@ -44,7 +44,7 @@ var Personas = []Persona{
 	},
 	{
 		Key:         "acme-prod-01",
-		Name:        "Acme Corp (Production)",
+		Name:        "Optics and Design (Production)",
 		Environment: "production",
 		Plan:        "enterprise",
 		Team:        "customer",
@@ -52,7 +52,7 @@ var Personas = []Persona{
 	},
 	{
 		Key:         "acme-staging-01",
-		Name:        "Acme Corp (Staging)",
+		Name:        "Optics and Design (Staging)",
 		Environment: "staging",
 		Plan:        "enterprise",
 		Team:        "customer",
@@ -60,7 +60,7 @@ var Personas = []Persona{
 	},
 	{
 		Key:         "globex-prod-01",
-		Name:        "Globex Corp (Production)",
+		Name:        "Mammalians Nurturable (Production)",
 		Environment: "production",
 		Plan:        "team",
 		Team:        "customer",
@@ -68,7 +68,7 @@ var Personas = []Persona{
 	},
 	{
 		Key:         "initech-dev-01",
-		Name:        "Initech (Development)",
+		Name:        "Choreography and Merriment (Development)",
 		Environment: "development",
 		Plan:        "free",
 		Team:        "customer",
