@@ -7,11 +7,13 @@ LaunchDarkly feature flags, targeting, experimentation, and AI Configs. Written 
 
 ## The scenario
 
-ABC Company ships Kubescope, a Kubernetes security scanner. Today it runs a **legacy static
+Lumon Industries ships Kubescope, a Kubernetes security scanner. Today it runs a **legacy static
 scanner** (image/CVE scanning only). The team has built a **new runtime engine** that adds
 behavioral detection (unexpected shell exec, outbound connections to bad IPs, etc.) and re-scores
 static findings based on runtime exploitability — fewer false positives, plus new true positives
 static scanning can't see. This app is the dashboard where that rollout happens.
+
+This is based on my real-world experience at a SaaS security vendor where a new scanning engine was rolled out to all customers at once, causing compleate chaos ;)
 
 | Exercise requirement | Where it lives here |
 |---|---|
