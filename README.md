@@ -13,7 +13,7 @@ behavioral detection (unexpected shell exec, outbound connections to bad IPs, et
 static findings based on runtime exploitability — fewer false positives, plus new true positives
 static scanning can't see. This app is the dashboard where that rollout happens.
 
-This is based on my real-world experience at a SaaS security vendor where a new scanning engine was rolled out to all customers at once, causing compleate chaos ;)
+This is based on my real-world experience at a SaaS security vendor where a new scanning engine was rolled out to all customers at once, causing complete chaos ;)
 
 | Exercise requirement | Where it lives here |
 |---|---|
