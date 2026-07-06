@@ -1,17 +1,17 @@
-# K8s Security Posture Dashboard — LaunchDarkly SE Technical Exercise
+# Kubescope — LaunchDarkly SE Technical Exercise
 
-A mock Kubernetes vulnerability/runtime-findings dashboard, built to exercise LaunchDarkly
-feature flags, targeting, experimentation, and AI Configs. Written in Go, using the
+Kubescope is a mock Kubernetes vulnerability/runtime-findings dashboard, built to exercise
+LaunchDarkly feature flags, targeting, experimentation, and AI Configs. Written in Go, using the
 [LaunchDarkly Go server-side SDK](https://docs.launchdarkly.com/sdk/server-side/go) and
 [Go AI SDK](https://launchdarkly.com/docs/sdk/ai/go).
 
 ## The scenario
 
-ABC Company ships a Kubernetes security scanner. Today it runs a **legacy static scanner**
-(image/CVE scanning only). The team has built a **new runtime engine** that adds behavioral
-detection (unexpected shell exec, outbound connections to bad IPs, etc.) and re-scores static
-findings based on runtime exploitability — fewer false positives, plus new true positives static
-scanning can't see. This app is the dashboard where that rollout happens.
+ABC Company ships Kubescope, a Kubernetes security scanner. Today it runs a **legacy static
+scanner** (image/CVE scanning only). The team has built a **new runtime engine** that adds
+behavioral detection (unexpected shell exec, outbound connections to bad IPs, etc.) and re-scores
+static findings based on runtime exploitability — fewer false positives, plus new true positives
+static scanning can't see. This app is the dashboard where that rollout happens.
 
 | Exercise requirement | Where it lives here |
 |---|---|
@@ -118,7 +118,7 @@ response).
 
 ```bash
 git clone <this-repo>
-cd k8s-security-flags-demo
+cd kubescope
 cp .env.example .env
 # edit .env: set LD_SDK_KEY to your environment's server-side SDK key
 #            (optional) set ANTHROPIC_API_KEY to enable real AI Config completions

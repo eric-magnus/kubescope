@@ -1,4 +1,4 @@
-module github.com/emagnus/k8s-security-flags-demo
+module github.com/emagnus/kubescope
 
 go 1.24.0
 

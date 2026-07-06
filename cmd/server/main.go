@@ -1,7 +1,7 @@
-// Command server runs the K8s Security Posture Dashboard demo: a mock
-// vulnerability/runtime-findings dashboard used to exercise LaunchDarkly
-// feature flags, targeting, experimentation, and AI Configs. See README.md
-// for the full LaunchDarkly project setup this expects.
+// Command server runs Kubescope: a mock Kubernetes vulnerability/runtime-findings
+// dashboard used to exercise LaunchDarkly feature flags, targeting,
+// experimentation, and AI Configs. See README.md for the full LaunchDarkly
+// project setup this expects.
 package main
 
 import (
@@ -14,10 +14,10 @@ import (
 	"github.com/joho/godotenv"
 	ld "github.com/launchdarkly/go-server-sdk/v7"
 
-	"github.com/emagnus/k8s-security-flags-demo/internal/aiadvisor"
-	"github.com/emagnus/k8s-security-flags-demo/internal/ldcontexts"
-	"github.com/emagnus/k8s-security-flags-demo/internal/scanner"
-	"github.com/emagnus/k8s-security-flags-demo/internal/sse"
+	"github.com/emagnus/kubescope/internal/aiadvisor"
+	"github.com/emagnus/kubescope/internal/ldcontexts"
+	"github.com/emagnus/kubescope/internal/scanner"
+	"github.com/emagnus/kubescope/internal/sse"
 )
 
 // FlagScanEngine is the Part 1 / Part 2 flag: false serves the legacy static
@@ -87,7 +87,7 @@ func main() {
 	mux.HandleFunc("/api/triage", handleTriage(ldClient))
 	mux.HandleFunc("/api/advisor", handleAdvisor(advisor))
 
-	log.Printf("K8s Security Posture Dashboard listening on http://localhost:%s", port)
+	log.Printf("Kubescope listening on http://localhost:%s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
 		log.Fatal(err)
 	}

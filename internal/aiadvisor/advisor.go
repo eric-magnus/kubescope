@@ -24,8 +24,8 @@ import (
 	"github.com/launchdarkly/go-server-sdk/ldai/datamodel"
 	ld "github.com/launchdarkly/go-server-sdk/v7"
 
-	"github.com/emagnus/k8s-security-flags-demo/internal/ldcontexts"
-	"github.com/emagnus/k8s-security-flags-demo/internal/scanner"
+	"github.com/emagnus/kubescope/internal/ldcontexts"
+	"github.com/emagnus/kubescope/internal/scanner"
 )
 
 // ConfigKey must match the AI Config key you create in the LaunchDarkly
