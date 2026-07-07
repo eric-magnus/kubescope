@@ -7,9 +7,9 @@ exercise: flags, targeting, experimentation, and AI Configs, all in Go against t
 
 Lumon Industries runs Kubescope internally to scan its clusters. Right now it's a **legacy static
 scanner** — basically image/CVE scanning. There's a **new runtime engine** in the works that adds
-behavioral detection (unexpected shell exec, weird outbound connections, that kind of thing) and
-re-scores static findings based on whether they're actually exploitable at runtime. Fewer false
-positives, plus it catches stuff static scanning just can't see.
+behavioral detection (unexpected shell exec, weird outbound connections, that kind of thing, based on Falco) and
+re-scores static findings based on whether they're actually exploitable at runtime, giving fewer false
+positives, plus it catches stuff static scanning just can't see. "In-use" vulnerabilities derived from runtime data are a critical step towards true Attack Surface Management.
 
 This is loosely based on a real rollout I lived through at a SaaS security vendor, where a new
 scanning engine went out to every customer at once and things got messy fast. Hence the flag.
@@ -31,18 +31,6 @@ Requirement → where it lives:
 
 Everything's mock data — findings come from JSON fixtures shaped like real Trivy/Falco output
 (`internal/scanner/data/*.json`). No cluster required, no dependencies beyond Go and an LD account. For v2, would like to connect to live k8s clusters via kubeapi.
-
-## A couple of choices worth explaining
-
-Flags get evaluated server-side, not in the browser. Partly because that's how you'd actually want
-it in a security product (don't want targeting rules sitting in a JS bundle), partly because it
-made the SSE relay simpler to reason about.
-
-For the "no reload" bit: the Go SDK's `FlagTracker.AddFlagChangeListener()` fires whenever the
-flag config changes, and the server just rebroadcasts that over SSE to whatever's connected. The
-frontend hears it, re-fetches, re-renders. No websockets, no polling.
-
-The frontend itself is plain HTML/JS/CSS, no build step, no npm. Didn't need one for this.
 
 ## What you need
 
