@@ -1,159 +1,126 @@
 # Kubescope — LaunchDarkly SE Technical Exercise
 
-Kubescope is a mock Kubernetes vulnerability/runtime-findings dashboard, built to exercise
-LaunchDarkly feature flags, targeting, experimentation, and AI Configs. Written in Go, using the
-[LaunchDarkly Go server-side SDK](https://docs.launchdarkly.com/sdk/server-side/go) and
-[Go AI SDK](https://launchdarkly.com/docs/sdk/ai/go).
+Kubescope is a fake Kubernetes security dashboard I built to work through the LaunchDarkly SE
+exercise: flags, targeting, experimentation, and AI Configs, all in Go against the real LD SDKs.
 
-## The scenario
+## The idea
 
-Lumon Industries ships Kubescope, a Kubernetes security scanner. Today it runs a **legacy static
-scanner** (image/CVE scanning only). The team has built a **new runtime engine** that adds
-behavioral detection (unexpected shell exec, outbound connections to bad IPs, etc.) and re-scores
-static findings based on runtime exploitability — fewer false positives, plus new true positives
-static scanning can't see. This app is the dashboard where that rollout happens.
+Lumon Industries runs Kubescope internally to scan its clusters. Right now it's a **legacy static
+scanner** — basically image/CVE scanning. There's a **new runtime engine** in the works that adds
+behavioral detection (unexpected shell exec, weird outbound connections, that kind of thing) and
+re-scores static findings based on whether they're actually exploitable at runtime. Fewer false
+positives, plus it catches stuff static scanning just can't see.
 
-This is based on my real-world experience at a SaaS security vendor where a new scanning engine was rolled out to all customers at once, causing complete chaos ;)
+This is loosely based on a real rollout I lived through at a SaaS security vendor, where a new
+scanning engine went out to every customer at once and things got messy fast. Hence the flag.
 
-| Exercise requirement | Where it lives here |
-|---|---|
-| Part 1 — Feature Flag | `new-scan-engine-enabled` toggles legacy vs. runtime engine findings |
-| Part 1 — Instant release/rollback | Server-Sent Events (`/events`) push a refresh the instant the flag changes — no page reload |
-| Part 1 — Remediate via trigger | An LD Trigger (webhook) flips the flag off; fire it with `curl` to simulate an incident rollback |
-| Part 2 — Context attributes | A `cluster` context: `environment`, `plan`, `team`, `region` |
-| Part 2 — Individual targeting | The `internal-dogfood-eng` persona ("Macrodata Refinement") is targeted directly |
-| Part 2 — Rule-based targeting | A rule like `environment == production AND plan == enterprise` |
-| Extra credit — Experimentation | `Resolve` / `False positive` buttons fire `finding-resolved` / `finding-marked-false-positive` events, used as experiment metrics |
-| Extra credit — AI Configs | The "AI remediation advisor" panel is powered by an LD AI Config (`k8s-remediation-advisor`) managing the prompt + model |
+Requirement → where it lives:
 
-No real Kubernetes cluster is involved — findings are mock fixtures shaped like real
-Trivy/Falco-style output (`internal/scanner/data/*.json`), so the whole thing runs anywhere with
-just Go installed.
+- **Flag** — `new-scan-engine-enabled`, boolean, toggles legacy vs. runtime findings
+- **Instant release/rollback** — the flag change listener pushes over SSE (`/events`), so the
+  dashboard updates the second you flip it, no reload
+- **Remediate via trigger** — an LD Trigger flips the flag off; `curl` it to simulate an on-call
+  engineer killing a bad release
+- **Context attributes** — a `cluster` context: `environment`, `plan`, `team`, `region`
+- **Individual targeting** — `internal-dogfood-eng` ("Macrodata Refinement") is targeted directly
+- **Rule-based targeting** — `environment is production AND plan is enterprise`
+- **Experimentation (extra credit)** — Resolve / False positive buttons fire
+  `finding-resolved` / `finding-marked-false-positive` events for use as experiment metrics
+- **AI Configs (extra credit)** — the AI remediation panel is backed by an LD AI Config
+  (`k8s-remediation-advisor`) that controls the prompt and model
 
-## Architecture notes
+Everything's mock data — findings come from JSON fixtures shaped like real Trivy/Falco output
+(`internal/scanner/data/*.json`). No cluster required, no dependencies beyond Go and an LD account.
 
-- Flags are evaluated **server-side** (Go SDK), not in the browser. In a real security product you
-  generally don't want targeting rules/segments exposed in a client-side JS bundle, so the server
-  evaluates on behalf of whichever "cluster" context is selected and returns only the result.
-- "Instant switch, no reload" is implemented with the SDK's `FlagTracker.AddFlagChangeListener()`:
-  whenever the flag's configuration changes, the server broadcasts a message over a long-lived SSE
-  connection, and the page re-fetches its data and re-renders in place.
-- The frontend (`web/static/`) is plain HTML/CSS/JS — no build step — so setup is just "run the Go
-  binary."
+## A couple of choices worth explaining
 
-## Prerequisites
+Flags get evaluated server-side, not in the browser. Partly because that's how you'd actually want
+it in a security product (don't want targeting rules sitting in a JS bundle), partly because it
+made the SSE relay simpler to reason about.
+
+For the "no reload" bit: the Go SDK's `FlagTracker.AddFlagChangeListener()` fires whenever the
+flag config changes, and the server just rebroadcasts that over SSE to whatever's connected. The
+frontend hears it, re-fetches, re-renders. No websockets, no polling.
+
+The frontend itself is plain HTML/JS/CSS, no build step, no npm. Didn't need one for this.
+
+## What you need
 
 - Go 1.22+
-- A LaunchDarkly account ([free trial](https://launchdarkly.com/start-trial/))
-- Optional: an [Anthropic API key](https://console.anthropic.com/) if you want the AI Config panel
-  to call a real model instead of falling back to a canned response
+- An LD account — [trial's fine](https://launchdarkly.com/start-trial/)
+- Optionally an [Anthropic key](https://console.anthropic.com/) if you want the AI advisor
+  actually calling a model instead of returning canned text
 
-## 1. LaunchDarkly project setup
+## Setting up LaunchDarkly
 
-Do this once, in your LD dashboard, before running the app.
+Do this once in your LD project before running the app.
 
-### Context kind
+**Context kind** — create one with key `cluster` (Account settings → Context kinds). Nothing
+fancy needed, it just has to exist.
 
-Create a context kind with key `cluster` (Account settings → Context kinds). No special config
-needed beyond the key existing — it's used automatically once a flag/AI Config references it.
+**The flag** — create a boolean flag, key `new-scan-engine-enabled`.
 
-### Flag: `new-scan-engine-enabled`
+- Fallthrough / off variation: `false`
+- Individual target: context kind `cluster`, key `internal-dogfood-eng` → `true` (this is
+  "Macrodata Refinement," the internal cluster that always gets the new engine)
+- Rule: `environment` is one of `production` AND `plan` is one of `enterprise` → `true`
+- Turn the flag on — targeting rules do nothing while it's off
 
-Create a **boolean** flag with key `new-scan-engine-enabled`.
-
-- Default rule (fallthrough): serve `false` (legacy scanner) to everyone.
-- **Individual targeting:** under Targeting, add an individual target for context kind `cluster`,
-  key `internal-dogfood-eng` → serve `true`. This is "Macrodata Refinement," your internal dogfood
-  cluster that always gets the new engine early.
-- **Rule-based targeting:** add a rule — `environment` is one of `production` AND `plan` is one of
-  `enterprise` → serve `true`. This rolls the new engine out to your enterprise production
-  customers first.
-- Turn the flag **on** to activate targeting (with the flag off entirely, everyone gets the
-  off-variation regardless of rules).
-
-### Trigger (Part 1 — remediate)
-
-On the same flag, add a **Trigger** (Flag → three-dot menu → "Add Trigger" / Integrations →
-Triggers) that sets the flag to `false` (off) when invoked. Copy the generated webhook URL.
-
-To simulate an incident rollback:
+**Trigger** — add one to the same flag that sets it to `false`. Grab the webhook URL it gives
+you (LD only shows it once, so copy it before navigating away). Firing it should feel like an
+incident rollback:
 
 ```bash
 curl -X POST "<your-trigger-webhook-url>"
 ```
 
-Watch the running app's dashboard update instantly — no redeploy, no reload.
+**Metrics + experiment (extra credit)** — create two occurrence metrics: `finding-resolved`
+(higher is better) and `finding-marked-false-positive` (lower is better). Then set up an
+Experiment on `new-scan-engine-enabled` using them. You'll need to actually click around the app
+a bunch — switch personas, resolve/mark findings — to get enough events for anything meaningful
+to show up.
 
-### Metrics + Experiment (extra credit)
+**AI Config (extra credit)** — create one with key `k8s-remediation-advisor`. Add a variation
+with:
 
-Create two metrics (Metrics → Create metric), both **occurrence** metrics on custom event:
+- System message: _"You are a Kubernetes security remediation assistant. Given a finding, respond
+  with 3 concise, numbered remediation steps. Be specific to Kubernetes."_
+- User message: `Finding: {{finding_title}} (severity: {{finding_severity}}) on {{resource}}. CVE: {{cve}}. Details: {{finding_description}}`
+- A real Anthropic model, e.g. `claude-haiku-4-5` or `claude-sonnet-5`
 
-- `finding-resolved` (higher is better — engine surfaces real, actionable findings)
-- `finding-marked-false-positive` (lower is better — fewer wasted investigations)
+Add a second variation with a different prompt or model if you want to show off swapping them
+live. If you skip this whole section the app still works fine — the advisor just falls back to a
+canned response and says so (`source: fallback-*`).
 
-Then create an **Experiment** on `new-scan-engine-enabled` using these metrics. Run the app,
-switch between personas, and click "Resolve" / "False positive" on findings to generate events —
-do this a number of times across both engine variations (e.g. toggle targeting so different
-personas land on different variations) to get enough data for the experiment to show a trend.
-
-### AI Config (extra credit)
-
-Create an AI Config with key `k8s-remediation-advisor` (Account settings → AI Configs). Add at
-least one variation with:
-
-- A system message: something like _"You are a Kubernetes security remediation assistant. Given a
-  finding, respond with 3 concise, numbered remediation steps. Be specific to Kubernetes."_
-- A user message template using the variables this app supplies:
-  `Finding: {{finding_title}} (severity: {{finding_severity}}) on {{resource}}. CVE: {{cve}}. Details: {{finding_description}}`
-- A model name matching an Anthropic model you have access to (e.g. `claude-haiku-4-5` or
-  `claude-sonnet-5`)
-
-Add a second variation with a different prompt and/or model to demonstrate swapping them live —
-e.g. a "detailed steps + `claude-sonnet-5`" variation vs. a "concise bullets + `claude-haiku-4-5`"
-variation. Target/rollout between them however you like.
-
-If you skip this section entirely, the app still runs fine — the advisor panel falls back to a
-canned static remediation message and clearly labels itself as such (`source: fallback-*` in the
-response).
-
-## 2. Run it locally
+## Running it
 
 ```bash
 git clone <this-repo>
 cd kubescope
 cp .env.example .env
-# edit .env: set LD_SDK_KEY to your environment's server-side SDK key
-#            (optional) set ANTHROPIC_API_KEY to enable real AI Config completions
+# fill in LD_SDK_KEY (and ANTHROPIC_API_KEY if you want real completions)
 
 go run ./cmd/server
 ```
 
-Then open [http://localhost:8080](http://localhost:8080).
+Open [http://localhost:8080](http://localhost:8080). Needs Go on your PATH and port 8080 free
+(or set `PORT` to something else). No database, no cluster, nothing else running.
 
-Assumptions:
+## Demo flow
 
-- You have Go 1.22+ on your `PATH`.
-- Port 8080 is free (override with `PORT=xxxx go run ./cmd/server`).
-- No database, no cluster, no other services required.
+1. **Release/rollback** — pick "Macrodata Refinement" from the dropdown, it's on the runtime
+   engine (individually targeted). Flip the flag off in LD, watch it switch to the legacy scanner
+   in about a second, no reload.
+2. **Remediate** — flag back on, then hit the trigger URL with curl instead. Same instant flip,
+   different trigger.
+3. **Targeting** — "Optics and Design (Production)" should land on the runtime engine via the
+   rule; "Choreography and Merriment (Development)" shouldn't.
+4. **Experimentation** — click Resolve / False positive a bunch across personas, check the
+   experiment results in LD once there's enough data.
+5. **AI Configs** — click "AI remediation" on a finding, see the real model response plus which
+   config/variation served it. Change the default variation in LD, click again, watch it change.
 
-## 3. Demo script
-
-1. **Release/rollback (Part 1):** Open the app, select "Macrodata Refinement"
-   (`internal-dogfood-eng`) from the dropdown — engine badge shows "Runtime Engine v2" because
-   it's individually targeted. Go to the LD dashboard and toggle the flag off; watch the dashboard
-   flip to "Legacy Static Scanner" within about a second, with no reload.
-2. **Remediate (Part 1):** With the flag back on, fire the Trigger webhook via `curl` and watch
-   the same instant flip happen from an "operational" action instead of the dashboard toggle.
-3. **Targeting (Part 2):** Switch personas in the dropdown — "Optics and Design (Production)"
-   (`acme-prod-01`, enterprise/production) should get the runtime engine via the rule;
-   "Choreography and Merriment (Development)" (`initech-dev-01`, free/development) should not.
-4. **Experimentation (extra credit):** Click "Resolve"/"False positive" on a few findings per
-   persona, then check the Experiment results in LD after generating enough events.
-5. **AI Configs (extra credit):** Click "AI remediation" on any finding; the modal shows the
-   generated remediation plus which model/variation/config served it. Change the AI Config's
-   default variation in LD and click again to see the new prompt/model take effect immediately.
-
-## Project layout
+## Layout
 
 ```
 cmd/server/main.go          HTTP server, LD client wiring, routes
