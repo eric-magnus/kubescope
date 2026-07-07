@@ -30,7 +30,7 @@ Requirement → where it lives:
   (`k8s-remediation-advisor`) that controls the prompt and model
 
 Everything's mock data — findings come from JSON fixtures shaped like real Trivy/Falco output
-(`internal/scanner/data/*.json`). No cluster required, no dependencies beyond Go and an LD account.
+(`internal/scanner/data/*.json`). No cluster required, no dependencies beyond Go and an LD account. For v2, would like to connect to live k8s clusters via kubeapi.
 
 ## A couple of choices worth explaining
 
