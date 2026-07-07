@@ -43,6 +43,8 @@ This is currently mock data - findings come from JSON fixtures shaped like real 
 
 Do this once in your LD project before running the app.
 
+**SDK key** - grab your environment's server-side SDK key (Account settings → Projects → your project → your environment). You'll put this in `.env` as `LD_SDK_KEY` in the next section.
+
 **Context kind** - create one with key `cluster` (Account settings → Context kinds). Nothing
 fancy needed, it just has to exist.
 
