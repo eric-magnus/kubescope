@@ -12,21 +12,21 @@ re-scores static findings based on whether they're actually exploitable at runti
 positives, plus it catches stuff static scanning just can't see. "In-use" vulnerabilities derived from runtime data are a critical step towards true Attack Surface Management.
 
 This is loosely based on a real rollout I lived through at a SaaS security vendor, where a new
-scanning engine went out to every customer at once and things got messy fast. Hence the flag.
+scanning engine went out to every customer at once and chaos ensued. Hence the flag.
 
-Requirement → where it lives:
+Excercise Requirements > where they live:
 
-- **Flag** - `new-scan-engine-enabled`, boolean, toggles legacy vs. runtime findings
-- **Instant release/rollback** - the flag change listener pushes over SSE (`/events`), so the
+- **Flag** > `new-scan-engine-enabled`, boolean, toggles legacy vs. runtime findings
+- **Instant release/rollback** > the flag change listener pushes over SSE (`/events`), so the
   dashboard updates the second you flip it, no reload
-- **Remediate via trigger** - an LD Trigger flips the flag off; `curl` it to simulate an on-call
+- **Remediate via trigger** > an LD Trigger flips the flag off; `curl` it to simulate an on-call
   engineer killing a bad release
-- **Context attributes** - a `cluster` context: `environment`, `plan`, `team`, `region`
-- **Individual targeting** - `internal-dogfood-eng` ("Macrodata Refinement") is targeted directly
-- **Rule-based targeting** - `environment is production AND plan is enterprise`
-- **Experimentation (extra credit)** - Resolve / False positive buttons fire
+- **Context attributes** > a `cluster` context: `environment`, `plan`, `team`, `region`
+- **Individual targeting** > `internal-dogfood-eng` ("Macrodata Refinement") is targeted directly
+- **Rule-based targeting** > `environment is production AND plan is enterprise`
+- **Experimentation** - Resolve / False positive buttons fire
   `finding-resolved` / `finding-marked-false-positive` events for use as experiment metrics
-- **AI Configs (extra credit)** - the AI remediation panel is backed by an LD AI Config
+- **AI Configs** - the AI remediation panel is backed by an LD AI Config
   (`k8s-remediation-advisor`) that controls the prompt and model
 
 This is currently mock data - findings come from JSON fixtures shaped like real Trivy/Falco output
@@ -35,8 +35,8 @@ This is currently mock data - findings come from JSON fixtures shaped like real 
 ## What you need
 
 - Go 1.22+
-- An LD account - [trial's fine](https://launchdarkly.com/start-trial/)
-- Optionally an [Anthropic key](https://console.anthropic.com/) if you want the AI advisor
+- An LD account - (https://launchdarkly.com/start-trial/)
+- [Anthropic key](https://console.anthropic.com/) Optional if you want the AI advisor
   actually calling a model instead of returning canned text
 
 ## Setting up LaunchDarkly
@@ -94,7 +94,7 @@ go run ./cmd/server
 ```
 
 Open [http://localhost:8080](http://localhost:8080). Needs Go on your PATH and port 8080 free
-(or set `PORT` to something else). No database, no cluster, nothing else running.
+(or set `PORT` to something else)
 
 ## Demo flow
 
