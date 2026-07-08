@@ -23,7 +23,7 @@ Excercise Requirements > where they live:
   engineer killing a bad release
 - **Context attributes** > a `cluster` context: `environment`, `plan`, `team`, `region`
 - **Individual targeting** > `internal-dogfood-eng` ("Macrodata Refinement") is targeted directly
-- **Rule-based targeting** > `environment is production AND plan is enterprise`
+- **Rule-based targeting** > `environment is production AND plan is enterprise` - currently, this is the "Optics & Design Production" cluster. Individual targets take priority over rules, so if you add that specific cluster as a target serving false, it would override the rule.
 - **Experimentation** - Resolve / False positive buttons fire
   `finding-resolved` / `finding-marked-false-positive` events for use as experiment metrics
 - **AI Configs** - the AI remediation panel is backed by an LD AI Config
