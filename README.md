@@ -80,6 +80,8 @@ Add a second variation with a different prompt or model if you want to show off 
 live. If you skip this whole section the app still works fine - the advisor just falls back to a
 canned response and says so (`source: fallback-*`).
 
+I created a concise variation with haiku, and a detailed one using sonnet.
+
 ## Running it
 
 ```bash
