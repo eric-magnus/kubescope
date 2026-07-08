@@ -32,33 +32,28 @@ Excercise Requirements > where they live:
 This is currently mock data - findings come from JSON fixtures shaped like real Trivy/Falco output
 (`internal/scanner/data/*.json`). No cluster required, no dependencies beyond Go and an LD account. For v2, would like to connect to live k8s clusters via kubeapi.
 
-## What you need
+## Environmental requirements
 
 - Go 1.22+
-- An LD account - (https://launchdarkly.com/start-trial/)
-- [Anthropic key](https://console.anthropic.com/) Optional if you want the AI advisor
-  actually calling a model instead of returning canned text
+- [Anthropic key](https://console.anthropic.com/) - put this in your .env
 
 ## Setting up LaunchDarkly
 
-Do this once in your LD project before running the app.
+Do this in the LD project:
 
-**SDK key** - grab your environment's server-side SDK key (Account settings → Projects → your project → your environment). You'll put this in `.env` as `LD_SDK_KEY` in the next section.
+**SDK key** - grab your environment's server-side SDK key (Account settings → Projects → your project → your environment). Put this in `.env` as `LD_SDK_KEY`, use .env.example for the format.
 
-**Context kind** - create one with key `cluster` (Account settings → Context kinds). Nothing
-fancy needed, it just has to exist.
+**Context kind** - create one with key `cluster` (Account settings → Context kinds)
 
 **The flag** - create a boolean flag, key `new-scan-engine-enabled`.
 
 - Fallthrough / off variation: `false`
 - Individual target: context kind `cluster`, key `internal-dogfood-eng` → `true` (this is
   "Macrodata Refinement," the internal cluster that always gets the new engine)
-- Rule: `environment` is one of `production` AND `plan` is one of `enterprise` → `true`
+- Rule: `environment` is one of `production` AND `plan` is one of `enterprise` → `true` (turns the flag on for any clusters besides Macrodata Refinement are prod & enterprise). 
 - Turn the flag on - targeting rules do nothing while it's off
 
-**Trigger** - add one to the same flag that sets it to `false`. Grab the webhook URL it gives
-you (LD only shows it once, so copy it before navigating away). Firing it should feel like an
-incident rollback:
+**Trigger** - add one to the same flag that sets it to `false`. This will be used by the ops teams via automation to disable the new engine depending on backend metrics (there are concerns around infra stability with the new engine). Verified works.
 
 ```bash
 curl -X POST "<your-trigger-webhook-url>"
@@ -66,7 +61,7 @@ curl -X POST "<your-trigger-webhook-url>"
 
 **Metrics + experiment (extra credit)** - create two occurrence metrics: `finding-resolved`
 (higher is better) and `finding-marked-false-positive` (lower is better). Then set up an
-Experiment on `new-scan-engine-enabled` using them. This unfortunately takes a lot of clicks to generate enough data for the Experiment view, but you can see the results in Metrics>Event Explorer
+Experiment on `new-scan-engine-enabled` using them. This unfortunately takes a lot of clicks to generate enough data for the Experiment view, but you can see the metrics in Metrics>Event Explorer
 
 **AI Config (extra credit)** - create one with key `k8s-remediation-advisor`. Add a variation
 with:
@@ -74,13 +69,9 @@ with:
 - System message: _"You are a Kubernetes security remediation assistant. Given a finding, respond
   with 3 concise, numbered remediation steps. Be specific to Kubernetes."_
 - User message: `Finding: {{finding_title}} (severity: {{finding_severity}}) on {{resource}}. CVE: {{cve}}. Details: {{finding_description}}`
-- A real Anthropic model, e.g. `claude-haiku-4-5` or `claude-sonnet-5`
-
-Add a second variation with a different prompt or model if you want to show off swapping them
-live. If you skip this whole section the app still works fine - the advisor just falls back to a
-canned response and says so (`source: fallback-*`).
-
-I created a concise variation with haiku, and a detailed one using sonnet.
+- Use claude-haiku-4-5 model
+- Add a variation using claude-sonnet5, with the following system message: _"You are a senior Kubernetes security engineer conducting an incident review. Given a finding, provide a thorough, step-by-step remediation plan: relevant kubectl commands, applicable controls (Pod Security Standards, NetworkPolicies, Falco rules, OPA/Gatekeeper or Kyverno policies), and a brief note on the underlying risk. Be comprehensive, not brief."_
+- User message is the same as the haiku model
 
 ## Running it
 
@@ -88,27 +79,12 @@ I created a concise variation with haiku, and a detailed one using sonnet.
 git clone <this-repo>
 cd kubescope
 cp .env.example .env
-# fill in LD_SDK_KEY (and ANTHROPIC_API_KEY if you want real completions)
 
 go run ./cmd/server
 ```
 
 Open [http://localhost:8080](http://localhost:8080). Needs Go on your PATH and port 8080 free
 (or set `PORT` to something else)
-
-## Demo flow
-
-1. **Release/rollback** - pick "Macrodata Refinement" from the dropdown, it's on the runtime
-   engine (individually targeted). Flip the flag off in LD, watch it switch to the legacy scanner
-   in about a second, no reload.
-2. **Remediate** - flag back on, then hit the trigger URL with curl instead. Same instant flip,
-   different trigger.
-3. **Targeting** - "Optics and Design (Production)" should land on the runtime engine via the
-   rule; "Choreography and Merriment (Development)" shouldn't.
-4. **Experimentation** - click Resolve / False positive a bunch across personas, check the
-   experiment results in LD once there's enough data.
-5. **AI Configs** - click "AI remediation" on a finding, see the real model response plus which
-   config/variation served it. Change the default variation in LD, click again, watch it change.
 
 ## Layout
 
