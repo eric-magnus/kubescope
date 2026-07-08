@@ -66,9 +66,7 @@ curl -X POST "<your-trigger-webhook-url>"
 
 **Metrics + experiment (extra credit)** - create two occurrence metrics: `finding-resolved`
 (higher is better) and `finding-marked-false-positive` (lower is better). Then set up an
-Experiment on `new-scan-engine-enabled` using them. You'll need to actually click around the app
-a bunch - switch personas, resolve/mark findings - to get enough events for anything meaningful
-to show up.
+Experiment on `new-scan-engine-enabled` using them. This unfortunately takes a lot of clicks to generate enough data for the Experiment view, but you can see the results in Metrics>Event Explorer
 
 **AI Config (extra credit)** - create one with key `k8s-remediation-advisor`. Add a variation
 with:
