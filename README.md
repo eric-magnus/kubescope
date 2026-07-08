@@ -25,7 +25,7 @@ Excercise Requirements > where they live:
 - **Individual targeting** > `internal-dogfood-eng` ("Macrodata Refinement") is targeted directly
 - **Rule-based targeting** > `environment is production AND plan is enterprise` - currently, this is the "Optics & Design Production" cluster. Individual targets take priority over rules, so if you add that specific cluster as a target serving false, it would override the rule.
 - **Experimentation** > Resolve / False positive buttons fire
-  `finding-resolved`/`finding-marked-false-positive` events for use as experiment metrics
+  `finding-resolved`/`finding-marked-false-positive` events for use as experiment metrics. These are visible under Data>Event Explorer
 - **AI Configs** > the AI remediation panel is backed by an LD AI Config
   (`k8s-remediation-advisor`) that controls the prompt and model
 
