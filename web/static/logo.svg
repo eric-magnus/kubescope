@@ -1,0 +1,27 @@
+<svg width="680" height="680" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Kubescope logo</title>
+<desc>A circular badge combining a seven-spoke Kubernetes helm wheel with a scanning scope reticle, one spoke tip highlighted red to represent an actively detected finding.</desc>
+<circle cx="340" cy="340" r="300" fill="#0b1120" stroke="#223049" stroke-width="2"/>
+<circle cx="340" cy="340" r="200" fill="none" stroke="#5b8cff" stroke-width="6" opacity="0.55"/>
+<line x1="340" y1="140" x2="340" y2="116" stroke="#5b8cff" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+<line x1="540" y1="340" x2="564" y2="340" stroke="#5b8cff" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+<line x1="340" y1="540" x2="340" y2="564" stroke="#5b8cff" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+<line x1="140" y1="340" x2="116" y2="340" stroke="#5b8cff" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+<line x1="340" y1="300" x2="340" y2="200" stroke="#5b8cff" stroke-width="14" stroke-linecap="round"/>
+<line x1="371" y1="315" x2="449" y2="253" stroke="#5b8cff" stroke-width="14" stroke-linecap="round"/>
+<line x1="379" y1="349" x2="477" y2="371" stroke="#5b8cff" stroke-width="14" stroke-linecap="round"/>
+<line x1="357" y1="376" x2="401" y2="466" stroke="#5b8cff" stroke-width="14" stroke-linecap="round"/>
+<line x1="323" y1="376" x2="279" y2="466" stroke="#5b8cff" stroke-width="14" stroke-linecap="round"/>
+<line x1="301" y1="349" x2="204" y2="371" stroke="#5b8cff" stroke-width="14" stroke-linecap="round"/>
+<line x1="309" y1="315" x2="231" y2="253" stroke="#5b8cff" stroke-width="14" stroke-linecap="round"/>
+<circle cx="449" cy="253" r="10" fill="#5b8cff"/>
+<circle cx="477" cy="371" r="10" fill="#5b8cff"/>
+<circle cx="401" cy="466" r="10" fill="#5b8cff"/>
+<circle cx="279" cy="466" r="10" fill="#5b8cff"/>
+<circle cx="204" cy="371" r="10" fill="#5b8cff"/>
+<circle cx="231" cy="253" r="10" fill="#5b8cff"/>
+<circle cx="340" cy="340" r="42" fill="#5b8cff"/>
+<circle cx="340" cy="340" r="42" fill="none" stroke="#0b1120" stroke-width="4"/>
+<circle cx="340" cy="200" r="20" fill="none" stroke="#ef4444" stroke-width="3" opacity="0.5"/>
+<circle cx="340" cy="200" r="14" fill="#ef4444"/>
+</svg>

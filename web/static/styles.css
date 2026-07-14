@@ -38,8 +38,10 @@ body {
 }
 
 .brand-mark {
-  font-size: 28px;
-  color: var(--accent);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .brand h1 {
