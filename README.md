@@ -60,8 +60,23 @@ curl -X POST "<your-trigger-webhook-url>"
 ```
 
 **Metrics + experiment (extra credit)** - create two occurrence metrics: `finding-resolved`
-(higher is better) and `finding-marked-false-positive` (lower is better). Then set up an
-Experiment on `new-scan-engine-enabled` using them. This unfortunately takes a lot of clicks to generate enough data for the Experiment view, but you can see the metrics in Metrics>Event Explorer
+(higher is better) and `finding-marked-false-positive` (lower is better). Both need `cluster` as
+their randomization unit (the sentence-builder's "per user" dropdown defaults to `user` - change
+it). Then set up an Experiment on `new-scan-engine-enabled` using them, with `cluster` as
+"Randomize by".
+
+Clicking Resolve/False positive manually can't generate enough data: these are occurrence
+metrics, so they count unique converting units, not click volume, and Kubescope only has 5 fixed
+demo personas - the sample size caps at 5 no matter how many times you click. Instead, run:
+
+```bash
+go run ./cmd/seed
+```
+
+This generates ~400 synthetic cluster contexts, evaluates the real flag for each, and fires
+Resolve/False-positive events with a deliberate skew (runtime engine: fewer false positives, more
+resolved findings) so the experiment has enough exposures per treatment to say something
+meaningful within seconds.
 
 **AI Config (extra credit)** - create one with key `k8s-remediation-advisor`. Add a variation
 with:
@@ -90,6 +105,7 @@ Open [http://localhost:8080](http://localhost:8080). Needs Go on your PATH and p
 
 ```
 cmd/server/main.go          HTTP server, LD client wiring, routes
+cmd/seed/main.go            Synthetic traffic generator for the Experimentation extra credit
 internal/scanner/           Mock finding fixtures + engine selection logic
 internal/ldcontexts/        Demo "cluster" personas and LD context construction
 internal/aiadvisor/         AI Config integration for the remediation panel
