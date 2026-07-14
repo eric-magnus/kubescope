@@ -83,7 +83,7 @@ func main() {
 	})
 	mux.HandleFunc("/events", hub.ServeHTTP)
 	mux.HandleFunc("/api/personas", handlePersonas)
-	mux.HandleFunc("/api/dashboard", handleDashboard(ldClient))
+	mux.HandleFunc("/api/dashboard", handleDashboard(ldClient, advisor))
 	mux.HandleFunc("/api/triage", handleTriage(ldClient))
 	mux.HandleFunc("/api/advisor", handleAdvisor(advisor))
 
@@ -98,14 +98,17 @@ func handlePersonas(w http.ResponseWriter, r *http.Request) {
 }
 
 type dashboardResponse struct {
-	Persona  ldcontexts.Persona `json:"persona"`
-	Engine   scanner.Engine     `json:"engine"`
-	Reason   string             `json:"reason"`
-	Summary  scanner.Summary    `json:"summary"`
-	Findings []scanner.Finding  `json:"findings"`
+	Persona     ldcontexts.Persona `json:"persona"`
+	Engine      scanner.Engine     `json:"engine"`
+	Reason      string             `json:"reason"`
+	Summary     scanner.Summary    `json:"summary"`
+	Findings    []scanner.Finding  `json:"findings"`
+	AIVariation string             `json:"aiVariation"`
+	AIModel     string             `json:"aiModel"`
+	AIEnabled   bool               `json:"aiEnabled"`
 }
 
-func handleDashboard(ldClient *ld.LDClient) http.HandlerFunc {
+func handleDashboard(ldClient *ld.LDClient, advisor *aiadvisor.Advisor) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		persona := ldcontexts.Find(r.URL.Query().Get("persona"))
 		ldContext := persona.ToLDContext()
@@ -121,12 +124,17 @@ func handleDashboard(ldClient *ld.LDClient) http.HandlerFunc {
 		}
 		findings := scanner.FindingsFor(engine)
 
+		aiVariation, aiModel, aiEnabled := advisor.CurrentVariation(persona)
+
 		writeJSON(w, http.StatusOK, dashboardResponse{
-			Persona:  persona,
-			Engine:   engine,
-			Reason:   detail.Reason.String(),
-			Summary:  scanner.Summarize(findings),
-			Findings: findings,
+			Persona:     persona,
+			Engine:      engine,
+			Reason:      detail.Reason.String(),
+			Summary:     scanner.Summarize(findings),
+			Findings:    findings,
+			AIVariation: aiVariation,
+			AIModel:     aiModel,
+			AIEnabled:   aiEnabled,
 		})
 	}
 }

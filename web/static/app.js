@@ -10,6 +10,7 @@
 
 const personaSelect = document.getElementById("persona-select");
 const engineBadge = document.getElementById("engine-badge");
+const aiConfigBadge = document.getElementById("ai-config-badge");
 const evalReason = document.getElementById("eval-reason");
 const findingsBody = document.getElementById("findings-body");
 const sseStatus = document.getElementById("sse-status");
@@ -39,6 +40,11 @@ function render(data) {
   engineBadge.textContent = isRuntime ? "Runtime Engine v2" : "Legacy Static Scanner";
   engineBadge.className = `badge ${isRuntime ? "runtime" : "legacy"}`;
   evalReason.textContent = data.reason;
+
+  aiConfigBadge.textContent = data.aiEnabled
+    ? `AI config: ${data.aiModel || "unknown"}`
+    : "AI config: fallback";
+  aiConfigBadge.title = data.aiVariation ? `variation: ${data.aiVariation}` : "";
 
   document.getElementById("count-critical").textContent = data.summary.critical;
   document.getElementById("count-high").textContent = data.summary.high;

@@ -78,6 +78,15 @@ func fallbackConfig() ldai.Config {
 		Build()
 }
 
+// CurrentVariation reports which AI Config variation/model is currently
+// active for the given persona, without making a real model call -- just the
+// config lookup. Used to show the active config in the dashboard header.
+func (a *Advisor) CurrentVariation(persona ldcontexts.Persona) (variation string, model string, enabled bool) {
+	ldContext := persona.ToLDContext()
+	cfg := a.ai.CompletionConfig(ConfigKey, ldContext, fallbackConfig(), nil)
+	return cfg.VariationKey(), cfg.ModelName(), cfg.Enabled()
+}
+
 // Remediate evaluates the AI Config for the given persona/finding, calls the
 // configured model if possible, and always returns an Advisory (never leaves
 // the UI empty-handed).
