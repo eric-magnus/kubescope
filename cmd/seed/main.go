@@ -17,6 +17,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -30,11 +31,20 @@ const (
 	flagKey             = "new-scan-engine-enabled"
 	metricResolved      = "finding-resolved"
 	metricFalsePositive = "finding-marked-false-positive"
-	numUnits            = 400
+	defaultNumUnits     = 400
 )
 
 func main() {
 	_ = godotenv.Load()
+
+	numUnits := defaultNumUnits
+	if len(os.Args) > 1 {
+		n, err := strconv.Atoi(os.Args[1])
+		if err != nil || n <= 0 {
+			log.Fatalf("invalid unit count %q: must be a positive integer", os.Args[1])
+		}
+		numUnits = n
+	}
 
 	sdkKey := os.Getenv("LD_SDK_KEY")
 	if sdkKey == "" {
